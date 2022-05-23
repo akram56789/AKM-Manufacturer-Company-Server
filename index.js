@@ -46,11 +46,18 @@ async function run() {
         app.get('/myorders', async (req, res) => {
             const client = req.query.client
             console.log(client);
-            const query = { client}
+            const query = { client }
             const cursor = purchasingCollection.find(query);
-            const purchasing = await cursor.toArray();
-            res.send(purchasing)
+            const orders = await cursor.toArray();
+            res.send(orders)
 
+        })
+
+        app.delete('/order/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) }
+            const result = await purchasingCollection.deleteOne(query);
+            res.send(result);
         })
 
 
