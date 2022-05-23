@@ -17,7 +17,8 @@ async function run(){
     try{
         await client.connect();
         const productCollection = client.db('akm').collection('product');
-
+        const purchasingCollection = client.db('akm').collection('purchasing')
+        
         app.get('/product', async (req, res) => {
             const query = {};
             const cursor = productCollection.find(query);
@@ -29,6 +30,18 @@ async function run(){
             const query = { _id: ObjectId(id) };
             const product = await productCollection.findOne(query)
             res.send(product)
+        });
+        app.get('/purchasing', async(req, res) =>{
+            const purchase = req.query.purchase;
+            const query = {purchase: purchase};
+            const purchasings = await purchasingCollection.find(query).toArray();
+            res.send(purchasings);
+          })
+
+          app.post('/purchasing', async (req, res) => {
+            const newProduct = req.body;
+            const result = await purchasingCollection.insertOne(newProduct);
+            res.send(result);
         });
 
     }
