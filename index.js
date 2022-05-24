@@ -18,6 +18,8 @@ async function run() {
         await client.connect();
         const productCollection = client.db('akm').collection('product');
         const purchasingCollection = client.db('akm').collection('purchasing')
+        // const  userCollection = client.db('akm').collection('users')
+        const reviewCollection = client.db('akm').collection('review')
 
         app.get('/product', async (req, res) => {
             const query = {};
@@ -44,9 +46,9 @@ async function run() {
             res.send(result);
         });
         app.get('/myorders', async (req, res) => {
-            const client = req.query.client
-            console.log(client);
-            const query = { client }
+            const email = req.query.email
+            // console.log(client);
+            const query = { email }
             const cursor = purchasingCollection.find(query);
             const orders = await cursor.toArray();
             res.send(orders)
@@ -58,6 +60,26 @@ async function run() {
             const query = { _id: ObjectId(id) }
             const result = await purchasingCollection.deleteOne(query);
             res.send(result);
+        })
+
+        // app.put('/user/email', async(req, res)=>{
+        //     const email = req.params.email;
+        //     const user = req.body;
+        //     const filter = {email: email};
+        //     const options = {upsert: true};
+        //     const updateDoc = {
+        //         $ser: user,  
+        //     }
+        //     const result = await userCollection.updateOne(filter, updateDoc, options );
+        //     res.send(result)
+        // })
+
+        // add review
+        app.get('/reviews', async (req, res) => {
+            const query = {};
+            const cursor = reviewCollection.find(query);
+            const reviews = await cursor.toArray();
+            res.send(reviews);
         })
 
 
