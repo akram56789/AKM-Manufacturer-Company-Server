@@ -61,18 +61,21 @@ async function run() {
             const result = await purchasingCollection.deleteOne(query);
             res.send(result);
         })
-
-        // app.put('/user/email', async(req, res)=>{
-        //     const email = req.params.email;
-        //     const user = req.body;
-        //     const filter = {email: email};
-        //     const options = {upsert: true};
-        //     const updateDoc = {
-        //         $ser: user,  
-        //     }
-        //     const result = await userCollection.updateOne(filter, updateDoc, options );
-        //     res.send(result)
-        // })
+           
+        
+        app.put('/user/:email', async (req, res) => {
+            const email = req.params.email;
+            const user = req.body;
+            const filter = { email: email };
+            const options = { upsert: true };
+            const updateDoc = {
+              $set: user,
+            };
+            const result = await userCollection.updateOne(filter, updateDoc, options);
+            const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET)
+            res.send({result,token});
+          })
+ 
 
         // add review
         app.get('/reviews', async (req, res) => {
@@ -80,6 +83,11 @@ async function run() {
             const cursor = reviewCollection.find(query);
             const reviews = await cursor.toArray();
             res.send(reviews);
+        })
+        app.post('/reviews', async (req, res) => {
+            const review = req.body;
+            const result = await reviewCollection.insertOne(review);
+            res.send(result)
         })
 
 
