@@ -63,7 +63,7 @@ async function run() {
             const result = await purchasingCollection.insertOne(newProduct);
             res.send(result);
         });
-        app.get('/myorders', async (req, res) => {
+        app.get('/myorders', verifyJWT, async (req, res) => {
             const email = req.query.email
             // console.log(client);
             const query = { email }
@@ -80,12 +80,7 @@ async function run() {
             res.send(result);
         })
  
-        app.delete('/user/:email', async(req,res)=>{
-            const email = req.params.email;
-            const query = {email: email}
-            const result = await userCollection.deleteOne(query);
-            res.send(result)
-        })
+    
 
 
         app.put('/user/:email', async (req, res) => {
@@ -122,6 +117,14 @@ async function run() {
             const users = await cursor.toArray();
             res.send(users)
         })
+
+        app.delete('/user/:email', async(req,res)=>{
+            const email = req.params.email;
+            const query = {email: email}
+            const result = await userCollection.deleteOne(query);
+            res.send(result)
+        })
+
        app.get('/admin/:email', async (req, res) => {
             const email = req.params.email;
             const user = await userCollection.findOne({ email: email });
@@ -156,17 +159,6 @@ async function run() {
     }
 }
 run().catch(console.dir);
-
-
-
-
-
-
-
-
-
-
-
 
 
 //middleware
