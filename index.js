@@ -40,18 +40,19 @@ async function run() {
         const purchasingCollection = client.db('akm').collection('purchasing')
         const userCollection = client.db('akm').collection('users')
         const reviewCollection = client.db('akm').collection('review')
+        const paymentCollection = client.db('akm').collection('payments')
 
 
-        const verifyAdmin = async (req, res, next) => {
-            const requester = req.decoded.email;
-            const requesterAccount = await userCollection.findOne({ email: requester });
-            if (requesterAccount.role === 'admin') {
-                next();
-            }
-            else {
-                res.status(403).send({ message: 'forbidden' });
-            }
-        }
+        // const verifyAdmin = async (req, res, next) => {
+        //     const requester = req.decoded.email;
+        //     const requesterAccount = await userCollection.findOne({ email: requester });
+        //     if (requesterAccount.role === 'admin') {
+        //         next();
+        //     }
+        //     else {
+        //         res.status(403).send({ message: 'forbidden' });
+        //     }
+        // }
 
         app.get('/product', async (req, res) => {
             const query = {};
@@ -148,7 +149,7 @@ async function run() {
         app.get('/admin/:email', async (req, res) => {
             const email = req.params.email;
             const user = await userCollection.findOne({ email: email });
-            const isAdmin = user.role === 'admin';
+            const isAdmin = user?.role === 'admin';
             res.send({ admin: isAdmin })
         })
 
@@ -193,6 +194,26 @@ async function run() {
             res.send({ clientSecret: paymentIntent.client_secret })
 
         });
+
+        app.patch('/purchasing/:id', verifyJWT, async(req, res)=>{
+            const id = req.params.id;
+            const payment= req.body;
+            const filter = {_id: ObjectId(id)}
+            const updatedDoc = {
+                $set: {
+                    paid: true,
+                    transactionId: payment.transactionId
+
+                }
+            }
+            const result = await paymentCollection .insertOne(payment);
+            const updatePurchasing =  await purchasingCollection.updateOne(filter, updatedDoc);
+            res.send(updatedDoc);
+
+
+
+   }
+        )
 
 
     }
