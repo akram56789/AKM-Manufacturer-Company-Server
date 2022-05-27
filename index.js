@@ -1,3 +1,4 @@
+
 const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
@@ -66,6 +67,13 @@ async function run() {
             const product = await productCollection.findOne(query)
             res.send(product)
         });
+        app.delete('/product/:id', async(req,res)=>{
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) }
+            const result = await productCollection.deleteOne(query);
+            res.send(result);
+
+        })
         app.get('/purchasing', async (req, res) => {
             const purchase = req.query.purchase;
             const query = { purchase: purchase };
@@ -184,7 +192,7 @@ async function run() {
         app.post('/create-payment-intent', verifyJWT, async (req, res) => {
             const product = req.body;
             const productPrice = product.productPrice;
-            const amount = productPrice * 100;
+            const amount = productPrice * 10;
             // console.log(amount);
             const paymentIntent = await stripe.paymentIntents.create({
                 amount: amount,
