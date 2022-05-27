@@ -80,6 +80,12 @@ async function run() {
             const purchasings = await purchasingCollection.find(query).toArray();
             res.send(purchasings);
         })
+        app.get('/purchasing', async(req, res)=>{
+            const query = {}
+            const cursor = purchasingCollection.find(query);
+            const orders = await cursor.toArray()
+            res.send(orders)
+        })
         app.get('/purchasing/:id', verifyJWT, async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) }
